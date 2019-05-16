@@ -9,15 +9,13 @@ import org.springframework.stereotype.Repository;
 import com.note.model.*;
 
 @Repository
+public interface UserRepository extends JpaRepository<UserDetails, Long> {
+	public List<UserDetails> findByEmailAndPassword(String email, String password);
 
-public interface UserRepository extends JpaRepository<User, Integer> {
+	public void deleteById(int id);
 
-	public List<User> findByEmailAndPassword(String email, String password);
+	public Optional<UserDetails> findById(int id);
 
-	public void deleteByUserId(int id);
-
-	public Optional<User> findByUserId(int id);
-
-	public List<User> findByEmail(String email);
+	public List<UserDetails> findByEmail(String email);
 
 }

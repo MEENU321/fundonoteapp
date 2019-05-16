@@ -9,26 +9,27 @@ import com.note.model.*;
 
 
 
-	public interface UserService {
+public interface UserService {
 
-		public User UserRegistration(User user);
+	public UserDetails UserRegistration(UserDetails user,HttpServletRequest request);
 
-		public List<User> login(User user);
+	public List<UserDetails> login(UserDetails user);
 
-		public User updateUser(String token,User user);
+	public UserDetails updateUser(String token,UserDetails user);
 
-		public boolean deleteUser(String token);
-
-		/*
-		 * public String jwtToken(int id);
-		 * 
-		 * public int parseJWT(String jwt);
-		 */
-		
-		public List<User> findByEmailId(String email);
-		
-		public Optional<User> findById(int id);
-		
-		public String sendmail(String subject, User userdetails,String appUrl); 
-	}
+	public boolean deleteUser(String token);
 	
+	public String securePassword(String password);
+
+	/*
+	 * public String jwtToken(int id);
+	 * 
+	 * public int parseJWT(String jwt);
+	 */
+	
+	public List<UserDetails> findByEmailId(String email);
+	
+	public Optional<UserDetails> findById(int id);
+	
+	public String sendmail(String subject, UserDetails userdetails,String appUrl); 
+}

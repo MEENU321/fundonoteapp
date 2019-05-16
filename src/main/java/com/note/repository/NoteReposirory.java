@@ -8,11 +8,11 @@ import org.springframework.stereotype.Repository;
 import com.note.model.Note;
 
 @Repository
+public interface NoteReposirory extends JpaRepository<Note, Long> {
 
-public interface NoteRepository extends JpaRepository<Note, Integer> {
 	public List<Note> findByUserId(int id);
 
 	public List<Note> findByNoteId(int noteId);
-	
-	public List<Note> findByNoteIdAndUserId(int noteId,int userId);
+
+	public List<Note> findByNoteIdAndUserId(int noteId, int userId);
 }

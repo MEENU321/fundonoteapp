@@ -11,10 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.note.model.User;
+import com.note.model.UserDetails;
 import com.note.service.UserService;
 import com.note.util.TokenClass;
-
 @RestController
 
 public class LoginController {
@@ -24,12 +23,12 @@ public class LoginController {
 	@Autowired
 	TokenClass tokenClass;
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public String userLogin(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
-		List<User> userList = userService.login(user);
+	public String userLogin(@RequestBody UserDetails user, HttpServletRequest request, HttpServletResponse response) {
+		List<UserDetails> userList = userService.login(user);
 		if (userList.size() != 0) {
 			String token = tokenClass.jwtToken(userList.get(0).getId());
 			response.setHeader("JwtToken", token);
-			return "Welcome " + userList.get(0).getName() + " JWT--->" + token;
+			return "Welcome " + userList.get(0).getUserName() + " JWT--->" + token;
 		} else
 			return "Invalid Credentials";
 
@@ -37,7 +36,7 @@ public class LoginController {
 
 	// UPDATE
 	@RequestMapping(value = "/update", method = RequestMethod.PUT)
-	public String userUpdate(HttpServletRequest request, @RequestBody User user) {
+	public String userUpdate(HttpServletRequest request, @RequestBody UserDetails user) {
 		String token = request.getHeader("jwtToken");
 		System.out.println(token);
 		userService.updateUser(token, user);

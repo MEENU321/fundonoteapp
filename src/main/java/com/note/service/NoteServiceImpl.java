@@ -1,24 +1,29 @@
 package com.note.service;
 
+
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.note.util.*;
-import com.note.repository.*;
-import com.note.model.*;
+
+import com.note.model.Note;
+import com.note.repository.NoteReposirory;
+import com.note.util.TokenClass;
 
 @Service
 
 public class NoteServiceImpl implements NoteService {
 
 	@Autowired
-	NoteRepository noteRepository;
+	NoteReposirory noteRepository;
 
 	@Autowired
 	private TokenClass tokenClass;
+
+//	@Autowired
+//	private LabelRepository labelRepository;
 
 	@Override
 	public Note createNote(Note note, String token) {
@@ -27,7 +32,7 @@ public class NoteServiceImpl implements NoteService {
 		Date date = new Date();
 		Timestamp ts = new Timestamp(date.getTime());
 		note.setCreatedOn(ts);
-		note.setId(userId);
+		note.setUserId(userId);
 		return noteRepository.save(note);
 	}
 
@@ -42,8 +47,8 @@ public class NoteServiceImpl implements NoteService {
 		int noteId = note.getNoteId();
 		int userId = tokenClass.parseJWT(token);
 		List<Note> noteInfo = noteRepository.findByNoteIdAndUserId(noteId, userId);
-		Date date = new Date();
-		Timestamp ts = new Timestamp(date.getTime());
+		Date currentDate = new Date();
+		Timestamp ts = new Timestamp(currentDate.getTime());
 		noteInfo.forEach(existingUser -> {
 			existingUser
 					.setCreatedOn(note.getCreatedOn() != null ? note.getCreatedOn() : noteInfo.get(0).getCreatedOn());
@@ -87,4 +92,38 @@ public class NoteServiceImpl implements NoteService {
 		return list;
 	}
 
-}
+//	@Override
+//	public Label labelCreate(Label label, String token) {
+//		int userId = tokenClass.parseJWT(token);
+//		label.setUserId(userId);
+//
+//		return labelRepository.save(label);
+//	}
+//
+//	@Override
+//	public Label labelUpdate(Label label, String token,int labelId) {
+//		int userId = tokenClass.parseJWT(token);
+//		List<Label> list = labelRepository.findByUserIdAndLabelId(userId, labelId);
+//		list.forEach(userLabel -> {
+//			userLabel.setLabelName(label.getLabelName() != null ? label.getLabelName() : list.get(0).getLabelName());
+//		});
+//		label.setLabelId(labelId);
+//		label.setUserId(userId);
+//		return labelRepository.save(label);
+//	}
+//
+//	@Override
+//	public String labelDelete(String token, int labelId) {
+//		int userId = tokenClass.parseJWT(token);
+//		List<Label> list = labelRepository.findByUserIdAndLabelId(userId, labelId);
+//		labelRepository.delete(list.get(0));
+//		return "Deleted";
+//	}
+//
+//	@Override
+//	public List<Label> getLabels(String token) {
+//		int userId = tokenClass.parseJWT(token);
+//		List<Label> list = labelRepository.findByUserId(userId);
+//		return list;
+	}
+

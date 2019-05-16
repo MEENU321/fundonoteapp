@@ -2,43 +2,46 @@ package com.note.model;
 
 import java.sql.Timestamp;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-//@Table(name = "note")
 public class Note {
+	
 	@Id
-//	@Column(name = "noteId")
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private int noteId;
-	private Timestamp createdOn;
-	private Timestamp updatedOn;
-//	@Column(name = "")
 	private String title;
-
-//	@Column(name = "description")
 	private String description;
-
-//	@Column(name = "createTable")
-	private String createTable;
-
-//	@Column(name = "updateTime")
-	private Timestamp updateTime;
-
-//	@Column(name = "isArchieve")
-	private boolean isArchieve;
-
-//	@Column(name = "inTrash")
+	
+	
+	private Timestamp createdOn;
+	@Column(name ="updated_on")
+	private Timestamp updatedOn;
 	private boolean inTrash;
-
-//	@Column(name = "isPinned")
+	private boolean isArchive;
 	private boolean isPinned;
+	@Column(name = "id")
+	private int userId;
 
-//	@Column(name = "id")
-	private int id;
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+
+	public boolean isArchive() {
+		return isArchive;
+	}
+
+	public void setArchive(boolean isArchive) {
+		this.isArchive = isArchive;
+	}
 
 	public int getNoteId() {
 		return noteId;
@@ -64,28 +67,20 @@ public class Note {
 		this.description = description;
 	}
 
-	public String getCreateTable() {
-		return createTable;
+	public Timestamp getCreatedOn() {
+		return createdOn;
 	}
 
-	public void setCreateTable(String createTable) {
-		this.createTable = createTable;
+	public void setCreatedOn(Timestamp createdOn) {
+		this.createdOn = createdOn;
 	}
 
-	public Timestamp getUpdateTime() {
-		return updateTime;
+	public Timestamp getUpdatedOn() {
+		return updatedOn;
 	}
 
-	public void setUpdateTime(Timestamp updateTime) {
-		this.updateTime = updateTime;
-	}
-
-	public boolean isArchieve() {
-		return isArchieve;
-	}
-
-	public void setArchieve(boolean isArchieve) {
-		this.isArchieve = isArchieve;
+	public void setUpdatedOn(Timestamp updatedOn) {
+		this.updatedOn = updatedOn;
 	}
 
 	public boolean isInTrash() {
@@ -104,29 +99,4 @@ public class Note {
 		this.isPinned = isPinned;
 	}
 
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public Timestamp getCreatedOn() {
-		return createdOn;
-	}
-
-	public void setCreatedOn(Timestamp createdOn) {
-		this.createdOn = createdOn;
-	}
-
-	public Timestamp getUpdatedOn() {
-		return updatedOn;
-	}
-
-	public void setUpdatedOn(Timestamp updatedOn) {
-		this.updatedOn = updatedOn;
-	}
-
-	
 }

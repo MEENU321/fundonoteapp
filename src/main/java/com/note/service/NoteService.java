@@ -5,9 +5,8 @@ import java.util.List;
 import com.note.model.Note;
 
 public interface NoteService {
-
-	//public Note createNote(Note user, String token);
 	public Note createNote(Note note, String token);
+
 	public Note findById(int userId);
 
 	public Note updateNote(Note note, String token);
@@ -19,4 +18,12 @@ public interface NoteService {
 	public List<Note> getAllNotes();
 
 	public List<Note> getNotes(String token);
+//	public Label labelCreate(Label label, String token);
+//
+//	public Label labelUpdate(Label label, String token,int labelId);
+//
+//	public String labelDelete(String token, int labelId);
+//
+//	public List<Label> getLabels(String token);
+
 }

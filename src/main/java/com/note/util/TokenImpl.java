@@ -9,17 +9,6 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
-import java.util.Date;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtBuilder;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-
 @Service
 
 public class TokenImpl implements TokenClass {
@@ -30,7 +19,7 @@ public class TokenImpl implements TokenClass {
 		Date now = new Date(nowMillis);
 
 		JwtBuilder builder = Jwts.builder().setSubject(String.valueOf(id)).setIssuedAt(now)
-				.signWith(SignatureAlgorithm.HS256, TokenClass.base64SecretBytes);
+				.signWith(SignatureAlgorithm.HS256, "secretKey");
 
 		return builder.compact();
 	}
@@ -38,7 +27,7 @@ public class TokenImpl implements TokenClass {
 	public int parseJWT(String jwt) {
 
 		// This line will throw an exception if it is not a signed JWS (as expected)
-		Claims claims = Jwts.parser().setSigningKey(TokenClass.base64SecretBytes).parseClaimsJws(jwt).getBody();
+		Claims claims = Jwts.parser().setSigningKey("secretKey").parseClaimsJws(jwt).getBody();
 
 		System.out.println("Subject: " + claims.getSubject());
 

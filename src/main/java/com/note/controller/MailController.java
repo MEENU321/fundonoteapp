@@ -18,9 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.note.service.UserService;
 import com.note.util.TokenClass;
 import com.note.model.*;
-//import com.bridgelabz.springbootform.model.UserDetails;
-//import com.bridgelabz.springbootform.service.UserService;
-//import com.bridgelabz.springbootform.token.TokenClass;
+import com.note.repository.*;
+
 @RestController
 public class MailController {
 
@@ -29,12 +28,15 @@ public class MailController {
 
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private UserRepository userRepository;
 
 	@Autowired
 	TokenClass tokenClass;
 
 	@RequestMapping(value = "/sendMail")
-	public String sendMail(@RequestBody User user) {
+	public String sendMail(@RequestBody UserDetails user) {
 		MimeMessage message = sender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(message);
 
@@ -51,13 +53,13 @@ public class MailController {
 	}
 
 	@RequestMapping(value = "/forgot", method = RequestMethod.POST)
-	public String forgotPassword(@RequestBody User user, HttpServletRequest request,
+	public String forgotPassword(@RequestBody UserDetails user, HttpServletRequest request,
 			HttpServletResponse response) {
-		List<User> list = userService.findByEmailId(user.getEmail());
+		List<UserDetails> list = userService.findByEmailId(user.getEmail());
 		if (list.size() == 0) {
 			return "We didn't find an account for that e-mail address.";
 		} else {
-			User userdetails = list.get(0);
+			UserDetails userdetails = list.get(0);
 			String token = tokenClass.jwtToken(userdetails.getId());
 			response.setHeader("token", token);
 			String subject = "Password Reset Request";
@@ -72,9 +74,9 @@ public class MailController {
 
 		int id = tokenClass.parseJWT(token);
 		if (id >= 0) {
-			Optional<User> userList = userService.findById(id);
-			userList.get().setPassword(password);
-			userService.UserRegistration(userList.get());
+			Optional<UserDetails> userList = userService.findById(id);
+			userList.get().setPassword(userService.securePassword(password));
+			userRepository.save(userList.get());
 			return "Changed";
 		} else
 			return "Not changed";
@@ -85,11 +87,11 @@ public class MailController {
 	public String mailForActivation(HttpServletRequest request) {
 		String token = request.getHeader("token");
 		int userId = tokenClass.parseJWT(token);
-		Optional<User> list = userService.findById(userId);
+		Optional<UserDetails> list = userService.findById(userId);
 		if (list == null) {
 			return "We didn't find an account for that e-mail address.";
 		} else {
-			User userdetails = list.get();
+			UserDetails userdetails = list.get();
 
 			String appUrl = "http://localhost:8080" + "/active/token=" + token;
 			String subject = "To active your status";
@@ -104,9 +106,9 @@ public class MailController {
 
 		int id = tokenClass.parseJWT(token);
 		if (id >= 0) {
-			Optional<User> userList = userService.findById(id);
-			userList.get().setStatus(true);
-			userService.UserRegistration(userList.get());
+			Optional<UserDetails> userList = userService.findById(id);
+			userList.get().setActiveStatus(1);
+			userRepository.save(userList.get());
 			return "Changed";
 		} else
 			return "Not changed";

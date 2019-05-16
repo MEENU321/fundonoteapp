@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +15,12 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import com.note.model.User;
+import com.note.model.UserDetails;
 import com.note.repository.UserRepository;
 import com.note.util.TokenClass;
 
 @Service
 @Transactional
-
 
 public class UserServiceImpl implements UserService {
 	@Autowired
@@ -32,19 +32,42 @@ public class UserServiceImpl implements UserService {
 	TokenClass tokenClass;
 
 	@Override
-	public User UserRegistration(User user) {
+	public UserDetails UserRegistration(UserDetails user, HttpServletRequest request) {
 		System.out.println(securePassword(user.getPassword()));
 		user.setPassword(securePassword(user.getPassword()));
-		return userRepository.save(user);
+		userRepository.save(user);
+//		Optional<UserDetails> user1 = userRepository.findByUserId(user.getUserId());
+		if (user != null) {
+			System.out.println("Sucessfull reg");
+			// Optional<User> maybeUser = userRep.findById(user.getId());
+			String tokenGen = tokenClass.jwtToken(user.getId());
+//			UserDetails u = user1.get();
+			StringBuffer requestUrl = request.getRequestURL();
+			System.out.println(requestUrl);
+			String appUrl = requestUrl.substring(0, requestUrl.lastIndexOf("/"));
+			appUrl = appUrl + "/activestatus/" + "token=" + tokenGen;
+			System.out.println(appUrl);
+			String subject = "User Activation";
+
+			String s = sendmail(subject, user, appUrl);
+			System.out.println(s);
+			// return "Mail Sent Successfully";
+			return user;
+
+		} else {
+			System.out.println("Not sucessful reg");
+		}
+		return user;
 	}
 
 	@Override
-	public List<User> login(User user) {
-		List<User> userList = userRepository.findByEmailAndPassword(user.getEmail(),
+	public List<UserDetails> login(UserDetails user) {
+		List<UserDetails> userList = userRepository.findByEmailAndPassword(user.getEmail(),
 				securePassword(user.getPassword()));
 		return userList;
 	}
 
+	@Override
 	public String securePassword(String password) {
 		String generatedPassword = null;
 		try {
@@ -70,46 +93,20 @@ public class UserServiceImpl implements UserService {
 		return generatedPassword;
 	}
 
-	/*
-	 * private static final Key secret =
-	 * MacProvider.generateKey(SignatureAlgorithm.HS256); private static final
-	 * byte[] secretBytes = secret.getEncoded(); private static final String
-	 * base64SecretBytes = Base64.getEncoder().encodeToString(secretBytes);
-	 * 
-	 * @Override public String jwtToken(int id) {
-	 * 
-	 * long nowMillis = System.currentTimeMillis(); Date now = new Date(nowMillis);
-	 * 
-	 * JwtBuilder builder =
-	 * Jwts.builder().setSubject(String.valueOf(id)).setIssuedAt(now)
-	 * .signWith(SignatureAlgorithm.HS256, base64SecretBytes);
-	 * 
-	 * return builder.compact(); }
-	 * 
-	 * @Override public int parseJWT(String jwt) {
-	 * 
-	 * // This line will throw an exception if it is not a signed JWS (as expected)
-	 * Claims claims =
-	 * Jwts.parser().setSigningKey(base64SecretBytes).parseClaimsJws(jwt).getBody();
-	 * 
-	 * System.out.println("Subject: " + claims.getSubject());
-	 * 
-	 * return Integer.parseInt(claims.getSubject()); }
-	 */
-
 	@Override
-	public User updateUser(String token, User user) {
+	public UserDetails updateUser(String token, UserDetails user) {
 		int varifiedUserId = tokenClass.parseJWT(token);
-		Optional<User> maybeUser = userRepository.findByUserId(varifiedUserId);
-		User presentUser = maybeUser.map(existingUser -> {
+		Optional<UserDetails> maybeUser = userRepository.findById(varifiedUserId);
+		UserDetails presentUser = maybeUser.map(existingUser -> {
 			existingUser.setEmail(user.getEmail() != null ? user.getEmail() : maybeUser.get().getEmail());
-			existingUser.setPhonenumber(user.getPhonenumber() != null ? user.getPhonenumber() : maybeUser.get().getPhonenumber());
-			existingUser.setName(user.getName() != null ? user.getName() : maybeUser.get().getName());
-			existingUser.setPassword(user.getPassword() != null ? user.getPassword() : maybeUser.get().getPassword());
+			existingUser.setMobileNo(user.getMobileNo() != null ? user.getMobileNo() : maybeUser.get().getMobileNo());
+			existingUser.setUserName(user.getUserName() != null ? user.getUserName() : maybeUser.get().getUserName());
+			existingUser.setPassword(user.getPassword() != null ? securePassword(user.getPassword())
+					: securePassword(maybeUser.get().getPassword()));
 			return existingUser;
 		}).orElseThrow(() -> new RuntimeException("User Not Found"));
 
-		return UserRegistration(presentUser);
+		return userRepository.save(presentUser);
 	}
 
 	@Override
@@ -117,7 +114,7 @@ public class UserServiceImpl implements UserService {
 		int varifiedUserId = tokenClass.parseJWT(token);
 
 		// return userRep.deleteById(varifiedUserId);
-		Optional<User> maybeUser = userRepository.findByUserId(varifiedUserId);
+		Optional<UserDetails> maybeUser = userRepository.findById(varifiedUserId);
 		return maybeUser.map(existingUser -> {
 			userRepository.delete(existingUser);
 			return true;
@@ -125,17 +122,17 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<User> findByEmailId(String email) {
+	public List<UserDetails> findByEmailId(String email) {
 
 		return userRepository.findByEmail(email);
 	}
 
 	@Override
-	public Optional<User> findById(int id) {
-		return userRepository.findByUserId(id);
+	public Optional<UserDetails> findById(int id) {
+		return userRepository.findById(id);
 	}
 
-	public String sendmail(String subject, User userdetails, String appUrl) {
+	public String sendmail(String subject, UserDetails userdetails, String appUrl) {
 		MimeMessage message = sender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(message);
 
