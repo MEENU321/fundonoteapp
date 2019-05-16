@@ -8,10 +8,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.note.model.Label;
 import com.note.model.Note;
 import com.note.repository.NoteReposirory;
 import com.note.util.TokenClass;
-
+import com.note.repository.*;
 @Service
 
 public class NoteServiceImpl implements NoteService {
@@ -22,8 +23,8 @@ public class NoteServiceImpl implements NoteService {
 	@Autowired
 	private TokenClass tokenClass;
 
-//	@Autowired
-//	private LabelRepository labelRepository;
+	@Autowired
+	private LabelRepository labelRepository;
 
 	@Override
 	public Note createNote(Note note, String token) {
@@ -92,38 +93,38 @@ public class NoteServiceImpl implements NoteService {
 		return list;
 	}
 
-//	@Override
-//	public Label labelCreate(Label label, String token) {
-//		int userId = tokenClass.parseJWT(token);
-//		label.setUserId(userId);
-//
-//		return labelRepository.save(label);
-//	}
-//
-//	@Override
-//	public Label labelUpdate(Label label, String token,int labelId) {
-//		int userId = tokenClass.parseJWT(token);
-//		List<Label> list = labelRepository.findByUserIdAndLabelId(userId, labelId);
-//		list.forEach(userLabel -> {
-//			userLabel.setLabelName(label.getLabelName() != null ? label.getLabelName() : list.get(0).getLabelName());
-//		});
-//		label.setLabelId(labelId);
-//		label.setUserId(userId);
-//		return labelRepository.save(label);
-//	}
-//
-//	@Override
-//	public String labelDelete(String token, int labelId) {
-//		int userId = tokenClass.parseJWT(token);
-//		List<Label> list = labelRepository.findByUserIdAndLabelId(userId, labelId);
-//		labelRepository.delete(list.get(0));
-//		return "Deleted";
-//	}
-//
-//	@Override
-//	public List<Label> getLabels(String token) {
-//		int userId = tokenClass.parseJWT(token);
-//		List<Label> list = labelRepository.findByUserId(userId);
-//		return list;
+	@Override
+	public Label labelCreate(Label label, String token) {
+		int userId = tokenClass.parseJWT(token);
+		label.setUserId(userId);
+
+		return labelRepository.save(label);
 	}
+
+	@Override
+	public Label labelUpdate(Label label, String token,int labelId) {
+		int userId = tokenClass.parseJWT(token);
+		List<Label> list = labelRepository.findByUserIdAndLabelId(userId, labelId);
+		list.forEach(userLabel -> {
+			userLabel.setLabelName(label.getLabelName() != null ? label.getLabelName() : list.get(0).getLabelName());
+		});
+		label.setLabelId(labelId);
+		label.setUserId(userId);
+		return labelRepository.save(label);
+	}
+
+	@Override
+	public String labelDelete(String token, int labelId) {
+		int userId = tokenClass.parseJWT(token);
+		List<Label> list = labelRepository.findByUserIdAndLabelId(userId, labelId);
+		labelRepository.delete(list.get(0));
+		return "Deleted";
+	}
+
+	@Override
+	public List<Label> getLabels(String token) {
+		int userId = tokenClass.parseJWT(token);
+		List<Label> list = labelRepository.findByUserId(userId);
+		return list;
+	}}
 
