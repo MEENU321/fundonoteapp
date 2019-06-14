@@ -15,9 +15,12 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import com.note.model.LoginRequest;
 import com.note.model.UserDetails;
 import com.note.repository.UserRepository;
-import com.note.util.TokenClass;
+import com.note.util.Utility;
+
+
 
 @Service
 @Transactional
@@ -29,8 +32,12 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	JavaMailSender sender;
 	@Autowired
-	TokenClass tokenClass;
+	Utility tokenClass;
 
+	private LoginRequest user;
+	
+
+	
 	@Override
 	public UserDetails UserRegistration(UserDetails user, HttpServletRequest request) {
 		System.out.println(securePassword(user.getPassword()));
@@ -54,18 +61,37 @@ public class UserServiceImpl implements UserService {
 			// return "Mail Sent Successfully";
 			return user;
 
-		} else {
+		}
+
+		else {
 			System.out.println("Not sucessful reg");
 		}
 		return user;
 	}
 
 	@Override
-	public List<UserDetails> login(UserDetails user) {
+	public List<UserDetails> login(LoginRequest user) {
 		List<UserDetails> userList = userRepository.findByEmailAndPassword(user.getEmail(),
 				securePassword(user.getPassword()));
 		return userList;
 	}
+//	public UserDetails retrieveCourse(String email, String password) {
+//		Student student = retrieveStudent(studentId);
+///List<UserDetails> userList = userService.login(user);
+
+///	/if (userList.size() != 0)
+//		if (student == null) {
+//			return null;
+//		}
+//
+//		for (Course course : student.getCourses()) {
+//			if (course.getId().equals(courseId)) {
+//				return course;
+//			}
+//		}
+//
+//		return null;
+	
 
 	@Override
 	public String securePassword(String password) {
@@ -95,7 +121,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public UserDetails updateUser(String token, UserDetails user) {
-		int varifiedUserId = tokenClass.parseJWT(token);
+		int varifiedUserId = Utility.parseJWT(token);
 		Optional<UserDetails> maybeUser = userRepository.findById(varifiedUserId);
 		UserDetails presentUser = maybeUser.map(existingUser -> {
 			existingUser.setEmail(user.getEmail() != null ? user.getEmail() : maybeUser.get().getEmail());
@@ -111,7 +137,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public boolean deleteUser(String token) {
-		int varifiedUserId = tokenClass.parseJWT(token);
+		int varifiedUserId = Utility.parseJWT(token);
 
 		// return userRep.deleteById(varifiedUserId);
 		Optional<UserDetails> maybeUser = userRepository.findById(varifiedUserId);
@@ -149,4 +175,12 @@ public class UserServiceImpl implements UserService {
 		return "Mail Sent Success!";
 	}
 
+//	@Override
+//	public List<UserDetails> loginTest(String email, String password) {
+//		List<UserDetails> userList = userRepository.findByEmailAndPassword(user.getEmail(),
+//				securePassword(user.getPassword()));
+//		return userList;
+//	}
+
+	
 }

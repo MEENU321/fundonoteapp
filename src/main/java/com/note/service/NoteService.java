@@ -12,13 +12,13 @@ public interface NoteService {
 
 	public Note updateNote(Note note, String token);
 
-	public String deleteNote(int noteId, String token);
+	public String deleteNote(int noteId);
 
 	public Note getNoteInfo(int noteId);
 
 	public List<Note> getAllNotes();
 
-	public List<Note> getNotes(String token);
+	public  List<Note> getNotes(String token) ;
 	public Label labelCreate(Label label, String token);
 
 	public Label labelUpdate(Label label, String token,int labelId);

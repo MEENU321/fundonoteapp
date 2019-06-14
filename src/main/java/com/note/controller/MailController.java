@@ -1,4 +1,5 @@
 package com.note.controller;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -15,10 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.note.model.UserDetails;
+import com.note.repository.UserRepository;
 import com.note.service.UserService;
-import com.note.util.TokenClass;
-import com.note.model.*;
-import com.note.repository.*;
+import com.note.util.Utility;
+
 
 @RestController
 public class MailController {
@@ -28,12 +30,12 @@ public class MailController {
 
 	@Autowired
 	private UserService userService;
-	
+
 	@Autowired
 	private UserRepository userRepository;
 
 	@Autowired
-	TokenClass tokenClass;
+	Utility tokenClass;
 
 	@RequestMapping(value = "/sendMail")
 	public String sendMail(@RequestBody UserDetails user) {
@@ -60,7 +62,7 @@ public class MailController {
 			return "We didn't find an account for that e-mail address.";
 		} else {
 			UserDetails userdetails = list.get(0);
-			String token = tokenClass.jwtToken(userdetails.getId());
+			String token = Utility.jwtToken(userdetails.getId());
 			response.setHeader("token", token);
 			String subject = "Password Reset Request";
 			String appUrl = "request.getScheme() " + "://" + request.getServerName() + "/reset?token=" + token;
@@ -72,7 +74,7 @@ public class MailController {
 	public String changePassword(HttpServletRequest request, @RequestBody String password) {
 		String token = request.getHeader("token");
 
-		int id = tokenClass.parseJWT(token);
+		int id = Utility.parseJWT(token);
 		if (id >= 0) {
 			Optional<UserDetails> userList = userService.findById(id);
 			userList.get().setPassword(userService.securePassword(password));
@@ -86,7 +88,7 @@ public class MailController {
 	@RequestMapping(value = "/mail", method = RequestMethod.POST)
 	public String mailForActivation(HttpServletRequest request) {
 		String token = request.getHeader("token");
-		int userId = tokenClass.parseJWT(token);
+		int userId = Utility.parseJWT(token);
 		Optional<UserDetails> list = userService.findById(userId);
 		if (list == null) {
 			return "We didn't find an account for that e-mail address.";

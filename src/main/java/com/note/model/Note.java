@@ -1,6 +1,7 @@
 package com.note.model;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,14 +14,15 @@ public class Note {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.AUTO)
+	@Column(name = "note_id")
 	private int noteId;
 	private String title;
 	private String description;
 	
 	
-	private Timestamp createdOn;
+	private LocalDateTime createdOn;
 	@Column(name ="updated_on")
-	private Timestamp updatedOn;
+	private LocalDateTime updatedOn;
 	private boolean inTrash;
 	private boolean isArchive;
 	private boolean isPinned;
@@ -67,21 +69,7 @@ public class Note {
 		this.description = description;
 	}
 
-	public Timestamp getCreatedOn() {
-		return createdOn;
-	}
-
-	public void setCreatedOn(Timestamp createdOn) {
-		this.createdOn = createdOn;
-	}
-
-	public Timestamp getUpdatedOn() {
-		return updatedOn;
-	}
-
-	public void setUpdatedOn(Timestamp updatedOn) {
-		this.updatedOn = updatedOn;
-	}
+	
 
 	public boolean isInTrash() {
 		return inTrash;
@@ -97,6 +85,22 @@ public class Note {
 
 	public void setPinned(boolean isPinned) {
 		this.isPinned = isPinned;
+	}
+
+	public LocalDateTime getCreatedOn() {
+		return createdOn;
+	}
+
+	public void setCreatedOn(LocalDateTime createdOn) {
+		this.createdOn = createdOn;
+	}
+
+	public LocalDateTime getUpdatedOn() {
+		return updatedOn;
+	}
+
+	public void setUpdatedOn(LocalDateTime updatedOn) {
+		this.updatedOn = updatedOn;
 	}
 
 }
